@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import {MatInputModule} from '@angular/material/input';
 import {MatIconModule} from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { UsersService } from '../../services/users.service';
 import { Router } from '@angular/router';
 import { MessageService } from '../../services/message.service';
@@ -12,6 +12,7 @@ import { User } from '../../entities/user';
 import { zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core'
 import * as zxcvbnCommonPackage from '@zxcvbn-ts/language-common'
 import * as zxcvbnEnPackage from '@zxcvbn-ts/language-en'
+import { map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -42,11 +43,13 @@ export class RegisterComponent {
   
 
   registerModel = new FormGroup({
-    name: new FormControl('', [Validators.required, Validators.minLength(2)]),
+    name: new FormControl('', [Validators.required, Validators.minLength(2)], this.conflictsValidator('name')),
     email: new FormControl('', {validators: [Validators.required, 
                                             Validators.email,
                                             Validators.pattern("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+[.]{1,1}[a-zA-Z0-9-.]{2,}$"
-                                            )]}),
+                                            )],
+                                          asyncValidators: this.conflictsValidator('email')
+                                          }),
     password: new FormControl('', this.passwordValidator()),
     password2: new FormControl('')
   }, this.passwordsEqualValidator);
@@ -74,6 +77,22 @@ export class RegisterComponent {
     }
     pass2?.setErrors(null)
     return null;
+  }
+
+  conflictsValidator(field: string): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      const name = field === 'name' ? control.value : '';
+      const email = field === 'email' ? control.value : '';
+      const user = new User(name, email)
+      return this.usersService.userConflicts(user).pipe(
+        map(conflictsArray => {
+          if(conflictsArray.length > 0){
+            return {'serverConflict' : field + ' exists on server'};
+          }
+          return null;
+        })
+      )
+    }
   }
 
   register(){
