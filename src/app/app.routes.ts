@@ -11,7 +11,7 @@ export const routes: Routes = [
     {path: 'extended-users', component: ExtendedUsersComponent},
     {path: 'login', component: LoginComponent },
     {path: 'register', component: RegisterComponent},
-    {path: 'user/new', component: UserEditComponent},
+    {path: 'user/new', component: UserEditComponent, data: {newUser: true}},
     {path: 'user/edit/:id', component: UserEditComponent},
     {path: '', redirectTo: '/login', pathMatch:'full'},
     {path: '**', component: PageNotFoundComponent}

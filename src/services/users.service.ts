@@ -68,6 +68,13 @@ export class UsersService {
     ); 
   }
 
+  getUser(id: number): Observable<User>{
+    return this.http.get<User>(this.url + 'user/' + id + '/' + this.token).pipe(
+      map(jsonUser => User.clone(jsonUser)),
+      catchError(err => this.processError(err))
+    )
+  }
+
   login(auth: Auth): Observable<boolean>{
     return this.http.post(this.url + 'login', auth, {responseType: 'text'}).
     pipe(
@@ -100,6 +107,15 @@ export class UsersService {
 
   register(user: User): Observable<User>{
     return this.http.post<User>(this.url + 'register' , user).pipe(
+      map(jsonUser => User.clone(jsonUser)),
+      catchError(error => {
+        return this.processError(error);
+      })
+    )
+  }
+
+  saveUser(user: User): Observable<User>{
+    return this.http.post<User>(this.url + 'users/' + this.token , user).pipe(
       map(jsonUser => User.clone(jsonUser)),
       catchError(error => {
         return this.processError(error);

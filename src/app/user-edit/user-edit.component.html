@@ -61,7 +61,7 @@
             }
             </mat-error>
         </mat-form-field>
-        <mat-slide-toggle>User is active</mat-slide-toggle>
+        <mat-slide-toggle formControlName="active">User is active</mat-slide-toggle>
         <p>Belongs to groups:</p>
         <div formArrayName="groups">
             @for(group of groups.controls; track i; let i = $index){
