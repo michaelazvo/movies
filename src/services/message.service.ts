@@ -16,4 +16,8 @@ export class MessageService {
   success(msg: string, duration = 5000){
     this.snackBar.open(msg, "SUCCESS", {duration, panelClass: "successMessage"});
   }
+
+  info(msg: string, duration = 5000){
+    this.snackBar.open(msg, "INFO", {duration, panelClass: "infoMessage"});
+  }
 }

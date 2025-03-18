@@ -1,11 +1,12 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { User } from '../entities/user';
-import { catchError, EMPTY, map, Observable, of, tap, throwError } from 'rxjs';
+import { catchError, defaultIfEmpty, EMPTY, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Auth } from '../entities/auth';
 import { MessageService } from './message.service';
 import { Group } from '../entities/group';
 
+export const DEFAULT_NAVIGATE_AFTER_LOGIN = '/extended-users'
 @Injectable({
   providedIn: 'root'
 })
@@ -17,6 +18,7 @@ export class UsersService {
           
   ];
   url = 'http://localhost:8080/';
+  navigateAfterLogin = DEFAULT_NAVIGATE_AFTER_LOGIN;
 
 
   loggedUserS = signal(this.userName);
@@ -25,7 +27,7 @@ export class UsersService {
     if(value){
       localStorage.setItem('moviesToken', value);
     } else {
-      localStorage.removeItem('movieToken');
+      localStorage.removeItem('moviesToken');
     }
   }
 
@@ -105,6 +107,22 @@ export class UsersService {
     
   }
 
+  isLoggedIn():boolean{
+    return !!this.token;
+  }
+
+  isLoggedInAsync(): Observable<boolean>{
+    if (!this.token) return of(false);
+    return this.http.get<void>(this.url + 'check-token/' + this.token).pipe(
+      map(() => true),
+      catchError(err => this.logout().pipe(
+          switchMap(() => this.processError(err))
+        )
+      ),
+        defaultIfEmpty(false)
+    )
+  }
+
   register(user: User): Observable<User>{
     return this.http.post<User>(this.url + 'register' , user).pipe(
       map(jsonUser => User.clone(jsonUser)),
@@ -149,6 +167,20 @@ export class UsersService {
       catchError(error=> this.processError(error))
 
     )
+  }
+
+  saveGroup(group: Group): Observable<Group>{
+    return this.http.post<Group>(this.url + 'groups/' + this.token, group).pipe(
+      map(jsonGroup => Group.clone(jsonGroup)),
+      catchError(error=> this.processError(error))
+    )
+  }
+
+  deleteGroup(id: number): Observable<boolean> {
+    return this.http.delete<void>(this.url + 'group/' + id + '/' + this.token).pipe(
+      map(() => true),
+      catchError(error=> this.processError(error))
+    );
   }
 
   processError(error:any){

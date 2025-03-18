@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
 import  {MatTableModule} from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatSortModule} from '@angular/material/sort';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatTabsModule} from '@angular/material/tabs';
+import { MatCardModule } from '@angular/material/card';
 
 const modules = [
   MatDialogModule,
@@ -18,7 +19,8 @@ const modules = [
   MatIconModule,
   MatPaginatorModule,
   MatTableModule,
-  MatTabsModule
+  MatTabsModule,
+  MatCardModule
 ];
 
 
