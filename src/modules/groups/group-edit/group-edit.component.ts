@@ -18,10 +18,14 @@ export class GroupEditComponent implements OnInit{
   group?: Group;
 
   ngOnInit(): void {
-    this.route.paramMap.pipe(
-      map(params => Number(params.get('id'))),
-      switchMap(groupId => this.usersService.getGroup(groupId))
-    ).subscribe(group => this.group = group)
+    //this.route.paramMap.pipe(
+      //map(params => Number(params.get('id'))),
+     // switchMap(groupId => this.usersService.getGroup(groupId))
+    //).subscribe(group => this.group = group)
+
+    this.route.data.subscribe(data => {
+      this.group = data['group'];
+    })
   }
 
   saveGroup(groupToSave: Group){

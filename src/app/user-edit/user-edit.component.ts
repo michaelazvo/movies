@@ -11,7 +11,10 @@ import { UsersService } from '../../services/users.service';
 import { Group } from '../../entities/group';
 import { ActivatedRoute, Router } from '@angular/router';
 import { User } from '../../entities/user';
-import { map, of, switchMap, tap } from 'rxjs';
+import { map, Observable, of, switchMap, tap } from 'rxjs';
+import { CanDeactivateComponent } from '../../guards/can-deactivate.guard';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-user-edit',
@@ -19,15 +22,18 @@ import { map, of, switchMap, tap } from 'rxjs';
   templateUrl: './user-edit.component.html',
   styleUrl: './user-edit.component.css'
 })
-export class UserEditComponent implements OnInit{
+export class UserEditComponent implements OnInit, CanDeactivateComponent{
+  
   usersService = inject(UsersService);
   router = inject(Router);
   route = inject(ActivatedRoute);
+  dialog = inject(MatDialog)
   titleS = signal('New user');
   hide = true;
   userId? : number;
   inputUser? : User;
   allGroups : Group[] = [];
+  userSaved = false;
 
   userModel = new FormGroup({
     name: new FormControl('', {validators: [Validators.required]}),
@@ -79,12 +85,24 @@ export class UserEditComponent implements OnInit{
     const password = (this.password.value || '').trim() || undefined;
     const user = new User(this.name.value, this.email.value, this.userId, undefined, password, this.active.value, groups);
     this.usersService.saveUser(user).subscribe(savedUser => {
+        this.userSaved = true;
         this.router.navigateByUrl('/extended-users');
     })
   }
   printErrors(e: ValidationErrors) {
     return JSON.stringify(e);
   }
+
+  canDeactivate(): boolean | Observable<boolean>{
+    if(this.userModel.dirty && ! this.userSaved) {
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+                            data: new ConfirmDialogData('Leaving page?',
+                              'User is edited but not saved. Do you want to leave the page without save?')});
+        return dialogRef.afterClosed();
+    }
+    return true
+  }
+
   get name(): FormControl<string> {
     return this.userModel.get('name') as FormControl<string>;
   }

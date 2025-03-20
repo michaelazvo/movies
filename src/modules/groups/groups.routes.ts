@@ -5,13 +5,22 @@ import { GroupEditComponent } from "./group-edit/group-edit.component";
 import { GroupNewComponent } from "./group-new/group-new.component";
 import { authGuard } from "../../guards/auth.guard";
 import { authAsyncGuard } from "../../guards/auth-async.guard";
+import { groupResolverGuard } from "../../guards/group-resolver-guard";
 
 export const GROUPES_ROUTES: Routes = [
     {path: '', 
         component: GroupsMenuComponent,
         children: [
             {path: '', component: GroupsListComponent},
-            {path: 'edit/:id', component: GroupEditComponent, canActivate:[authAsyncGuard]},
+            {path: 'edit/:id', component: GroupEditComponent, 
+                canActivate:[authAsyncGuard], 
+                resolve: {
+                    group: groupResolverGuard
+                },
+                data: {
+                    nieco: 'aaa'
+                }
+            },
             {path: 'new', component: GroupNewComponent, canActivate:[authAsyncGuard]}
         ]
     }
