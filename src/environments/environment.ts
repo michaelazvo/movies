@@ -1,3 +1,4 @@
 export const environment = {
-    restServerUrl: 'http://mojserver.sk'
+    restServerUrl: 'https://mojserver.sk',
+    websocketUrl: 'wss://ws.mojserver.sk'
 };

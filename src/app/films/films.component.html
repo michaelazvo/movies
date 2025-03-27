@@ -3,9 +3,6 @@
   <input matInput (keyup)="filter($event)">
 </mat-form-field>
 
-@if(filmsResource.isLoading()){
-  <h2>Loading...</h2>
-} @else {
 
 <table mat-table matSort [dataSource]="filmsS()">
     <mat-text-column name="id" headerText="ID"></mat-text-column>
@@ -39,8 +36,11 @@
     <tr mat-header-row *matHeaderRowDef="columnsToDisplayS()"></tr>
     <tr mat-row *matRowDef="let film; columns: columnsToDisplayS()"></tr>
 
+</table>
 
-  </table>
+@if(filmsResource.isLoading()){
+    <h2>Loading...</h2>
+}
 
 <mat-paginator  [length]="responseS()?.totalCount || 0"
                 [pageSize]="5"
@@ -48,4 +48,3 @@
                 aria-label="Select page">
 </mat-paginator>
 
-}

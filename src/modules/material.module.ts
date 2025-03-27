@@ -9,6 +9,7 @@ import {MatSortModule} from '@angular/material/sort';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatTabsModule} from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
+import {MatListModule} from '@angular/material/list';
 
 const modules = [
   MatDialogModule,
@@ -20,7 +21,8 @@ const modules = [
   MatPaginatorModule,
   MatTableModule,
   MatTabsModule,
-  MatCardModule
+  MatCardModule,
+  MatListModule
 ];
 
 
