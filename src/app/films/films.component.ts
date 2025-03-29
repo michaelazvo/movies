@@ -7,10 +7,11 @@ import {rxResource, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import { switchMap, tap } from 'rxjs';
 import { MatSort } from '@angular/material/sort';
 import { UsersService } from '../../services/users.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-films',
-  imports: [MaterialModule],
+  imports: [MaterialModule, RouterLink],
   templateUrl: './films.component.html',
   styleUrl: './films.component.css'
 })
@@ -20,7 +21,7 @@ export default class FilmsComponent implements AfterViewInit{
   usersService = inject(UsersService);
   
   columnsToDisplayS = computed(() => this.usersService.loggedUserS() 
-                                ? ['id', 'nazov', 'rok', 'slovenskyNazov', 'afi1998', 'afi2007']
+                                ? ['id', 'nazov', 'rok', 'slovenskyNazov', 'afi1998', 'afi2007', 'actions']
                                 : ['id', 'nazov', 'rok']);
 
   paginatorS = viewChild.required<MatPaginator>(MatPaginator);

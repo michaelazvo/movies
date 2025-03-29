@@ -7,6 +7,7 @@ import { RegisterComponent } from './register/register.component';
 import { UserEditComponent } from './user-edit/user-edit.component';
 import { authGuard, authMatchGuard } from '../guards/auth.guard';
 import { canDeactivateGuard } from '../guards/can-deactivate.guard';
+import { FilmEditComponent } from './film-edit/film-edit.component';
 
 export const routes: Routes = [
     {path: 'users', component: UsersComponent },
@@ -15,6 +16,8 @@ export const routes: Routes = [
     {path: 'register', component: RegisterComponent},
     {path: 'user/new', component: UserEditComponent, data: {newUser: true}},
     {path: 'user/edit/:id', component: UserEditComponent, canActivate:[authGuard], canDeactivate:[canDeactivateGuard]},
+    {path: 'film/new', component: FilmEditComponent, data: {newFilm: true}},
+    {path: 'film/edit/:id', component: FilmEditComponent, canActivate:[authGuard], canDeactivate:[canDeactivateGuard]},
     {path: 'groups', 
         loadChildren: ()=> import('../modules/groups/groups.module'),
         canMatch: [authMatchGuard]
