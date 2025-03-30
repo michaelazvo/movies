@@ -41,25 +41,33 @@ export class FilmsService {
 
     }
     return this.http.get<FilmsResponse>(this.url + 'films', options).pipe(
-        catchError(error => this.usersService.processError(error))
+        catchError(error => this.processError(error))
     )
   }
 
     getFilm(id: number): Observable<Film> {
       return this.http.get<Film>(`${this.url}films/${id}`, this.getTokenHeader()).pipe(
         map(json => Film.clone(json)),
-        catchError(err => this.usersService.processError(err))
+        catchError(err => this.processError(err))
       );
     }
 
     saveFilm(film: Film): Observable<Film> {
       return this.http.post<Film>(`${this.url}films`, film, this.getTokenHeader()).pipe(
         map(json => Film.clone(json)),
-        catchError(err => this.usersService.processError(err))
+        catchError(err => this.processError(err))
       );
     }
-  
 
+    deleteFilm(id: number): Observable<void> {
+      return this.http.delete<void>(
+        `${this.url}films/${id}`,
+        this.getTokenHeader() 
+      ).pipe(
+        catchError(err => this.processError(err))
+      );
+    }
+    
     
     processError(error:any){
         if(error instanceof HttpErrorResponse){

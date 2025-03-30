@@ -1,0 +1,41 @@
+.form-container {
+  padding: 24px;
+}
+
+.section-title {
+  margin-top: 24px;
+  font-size: 1.1rem;
+}
+
+.main-title {
+  font-size: 1.4rem;
+}
+
+.section-divider {
+  margin: 0 0 24px 0;
+  border: none;
+  border-top: 2px solid #ccc;
+}
+
+.flex-wrap-gap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.form-entry-box {
+  padding: 16px;
+  padding-bottom: 0;
+  border-radius: 8px;
+  background: #ffffff;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.margin-top {
+  margin-top: 12px;
+}

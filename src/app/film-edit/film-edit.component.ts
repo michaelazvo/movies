@@ -13,7 +13,6 @@ import { switchMap, tap, map } from 'rxjs/operators';
 import { CanDeactivateComponent } from '../../guards/can-deactivate.guard';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../confirm-dialog/confirm-dialog.component';
-import { MatOption, MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { Postava } from '../../entities/postava';
 import { Person } from '../../entities/person';
@@ -48,7 +47,13 @@ export class FilmEditComponent implements OnInit, CanDeactivateComponent {
   filmModel = new FormGroup({
     nazov: new FormControl('', { validators: [Validators.required] }),
     slovenskyNazov: new FormControl(''),
-    rok: new FormControl('', { validators: [Validators.required] }),
+    rok: new FormControl('', {
+      validators: [
+        Validators.required,
+        Validators.min(1888),
+        Validators.max(new Date().getFullYear())
+      ]
+    }),
     imdbID: new FormControl(''),
     reziser: new FormArray([]),
     postava: new FormArray([]),
@@ -63,10 +68,9 @@ export class FilmEditComponent implements OnInit, CanDeactivateComponent {
       map(params => Number(params.get('id')) || undefined),
       tap(id => {
         this.filmId = id;
-        console.log('filmId', this.filmId);
       }),
       switchMap(id =>
-        id ? this.filmsService.getFilm(id) : of(new Film('', 0, '', '', [], [], {}))
+        id ? this.filmsService.getFilm(id) : of(new Film('', 2000, '', '', [], [], {}))
       ),
       tap(film => {
         this.inputFilm = film;
@@ -78,11 +82,10 @@ export class FilmEditComponent implements OnInit, CanDeactivateComponent {
         this.rok.setValue(film.rok);
         this.imdbID.setValue(film.imdbID);
 
-        // Populate directors (reziser)
+        
         const reziserArray = this.filmModel.get('reziser') as FormArray;
         if (film.reziser && film.reziser.length) {
           film.reziser.forEach((director) => {
-            // Assuming director is a Person with krstneMeno, stredneMeno, priezvisko
             reziserArray.push(new FormGroup({
               krstneMeno: new FormControl(director.krstneMeno, { validators: [Validators.required] }),
               stredneMeno: new FormControl(director.stredneMeno),
@@ -90,20 +93,16 @@ export class FilmEditComponent implements OnInit, CanDeactivateComponent {
             }));
           });
         } else {
-          // Start with one empty director form group
           reziserArray.push(new FormGroup({
             krstneMeno: new FormControl('', { validators: [Validators.required] }),
             stredneMeno: new FormControl(''),
             priezvisko: new FormControl('', { validators: [Validators.required] })
           }));
         }
-        // Populate characters (postava)
-        // For characters (postava):
+
         const postavaArray = this.filmModel.get('postava') as FormArray;
         if (film.postava && film.postava.length) {
           film.postava.forEach((character) => {
-            // Assuming each character has a 'name' for the character’s name,
-            // an 'actor' object of type Person and a property 'typPostavy'
             postavaArray.push(new FormGroup({
               name: new FormControl(character.postava, { validators: [Validators.required] }),
               actorKrstneMeno: new FormControl(character.herec?.krstneMeno || '', { validators: [Validators.required] }),
@@ -113,7 +112,6 @@ export class FilmEditComponent implements OnInit, CanDeactivateComponent {
             }));
           });
         } else {
-          // Start with one empty character form group
           postavaArray.push(new FormGroup({
             name: new FormControl('', { validators: [Validators.required] }),
             actorKrstneMeno: new FormControl('', { validators: [Validators.required] }),
@@ -123,7 +121,6 @@ export class FilmEditComponent implements OnInit, CanDeactivateComponent {
           }));
         }
 
-        // Populate ranking positions (poradieVRebricku)
         const poradieGroup = this.filmModel.get('poradieVRebricku') as FormGroup;
         if (film.poradieVRebricku) {
           if ('AFI 2007' in film.poradieVRebricku) {
@@ -160,7 +157,7 @@ export class FilmEditComponent implements OnInit, CanDeactivateComponent {
   }
   
   removeCharacter(index: number) {
-    this.postava.removeAt(index);
+      this.postava.removeAt(index);
   }
 
   newRankingName = '';
@@ -212,7 +209,6 @@ export class FilmEditComponent implements OnInit, CanDeactivateComponent {
     return true;
   }
 
-  // Getters for form controls for easier access
   get nazov(): FormControl {
     return this.filmModel.get('nazov') as FormControl;
   }

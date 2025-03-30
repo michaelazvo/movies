@@ -1,10 +1,14 @@
 export class Person {
-
-  static clone(p: Person): Person | null {
-    if (!p) {
+  static clone(p: Partial<Person> | null | undefined): Person | null {
+    if (!p || p.id == null || p.krstneMeno == null || p.priezvisko == null) {
       return null;
     }
-    return new Person(p.id, p.krstneMeno, p.stredneMeno, p.priezvisko);
+    return new Person(
+      p.id,
+      p.krstneMeno,
+      p.stredneMeno ?? '',
+      p.priezvisko
+    );
   }
 
   constructor(
@@ -12,5 +16,5 @@ export class Person {
     public krstneMeno: string,
     public stredneMeno: string,
     public priezvisko: string
-  ){}
+  ) {}
 }
