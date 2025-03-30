@@ -7,10 +7,14 @@ import {rxResource, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import { switchMap, tap } from 'rxjs';
 import { MatSort } from '@angular/material/sort';
 import { UsersService } from '../../services/users.service';
+import { RouterLink } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../confirm-dialog/confirm-dialog.component';
+import { MessageService } from '../../services/message.service';
 
 @Component({
   selector: 'app-films',
-  imports: [MaterialModule],
+  imports: [MaterialModule, RouterLink],
   templateUrl: './films.component.html',
   styleUrl: './films.component.css'
 })
@@ -18,9 +22,11 @@ export default class FilmsComponent implements AfterViewInit{
   
   filmsService = inject(FilmsService);
   usersService = inject(UsersService);
+  dialog = inject(MatDialog);
+  msgService = inject(MessageService);
   
   columnsToDisplayS = computed(() => this.usersService.loggedUserS() 
-                                ? ['id', 'nazov', 'rok', 'slovenskyNazov', 'afi1998', 'afi2007']
+                                ? ['id', 'nazov', 'rok', 'slovenskyNazov', 'afi1998', 'afi2007', 'actions']
                                 : ['id', 'nazov', 'rok']);
 
   paginatorS = viewChild.required<MatPaginator>(MatPaginator);
@@ -59,6 +65,7 @@ export default class FilmsComponent implements AfterViewInit{
     effect(() => console.log(this.responseS()));
   }
 
+
   ngAfterViewInit(): void {
     this.paginatorS().page.subscribe(pageEvent => {
       console.log("Page event: ", pageEvent)
@@ -88,6 +95,26 @@ export default class FilmsComponent implements AfterViewInit{
 
   }
 
+  deletefilm(film: Film) {
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: new ConfirmDialogData('Deleting film', `Are you sure you want to delete film ${film.nazov}?`)
+    });
+  
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      if (result) {
+        this.filmsService.deleteFilm(film.id!).subscribe({
+          next: () => {
+            this.msgService.success('Film ' + film.nazov + ' deleted');
+            this.filmsResource.reload(); 
+          },
+          error: (err: { message: string; }) => {
+            this.msgService.error('Failed to delete film: ' + err.message);
+          }
+        });
+      }
+    });
+  }
 }
 
 class Query {

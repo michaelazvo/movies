@@ -1,0 +1,167 @@
+<form (ngSubmit)="save()" [formGroup]="filmModel" class="form-container">
+  <mat-card class="example-card" appearance="outlined">
+    
+    <mat-card-header>
+      <mat-card-title class="main-title">{{ titleS() }}</mat-card-title>
+    </mat-card-header>
+    <hr class="section-divider" />
+
+    <mat-card-content>
+    <div class="form-entry-box">
+      <div class="flex-wrap-gap">
+        <mat-form-field appearance="fill">
+          <mat-label>Film title</mat-label>
+          <input matInput formControlName="nazov">
+          <mat-error>
+            @if(nazov.errors) {
+              @if(nazov.errors['required']) {
+                Film title is required
+              } @else {
+                {{printErrors(nazov.errors)}}
+              }
+            }
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Slovak title</mat-label>
+          <input matInput formControlName="slovenskyNazov">
+          <mat-error>
+            @if(slovenskyNazov.errors) {
+              {{printErrors(slovenskyNazov.errors)}}
+            }
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Release year</mat-label>
+          <input matInput type="number" formControlName="rok">
+          <mat-error>
+            @if(rok.errors) {
+              @if(rok.errors['required']) {
+                Year is required
+              } @else if (rok.errors['min'] || rok.errors['max']) {
+                Year is out of valid range
+              } @else {
+                {{printErrors(rok.errors)}}
+              }
+            }
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>IMDB ID</mat-label>
+          <input matInput formControlName="imdbID">
+          <mat-error>
+            @if(imdbID.errors) {
+              {{printErrors(imdbID.errors)}}
+            }
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+      <p class="section-title">Directors:</p>
+      <div formArrayName="reziser">
+        @for(director of reziser.controls; track director; let i = $index) {
+          <div [formGroupName]="i"
+               [style.background]="i % 2 === 0 ? '#e8f0fe' : '#ffffff'"
+               class="form-entry-box">
+
+            <mat-form-field appearance="fill">
+              <mat-label>First name</mat-label>
+              <input matInput formControlName="krstneMeno">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Middle name</mat-label>
+              <input matInput formControlName="stredneMeno">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Surname</mat-label>
+              <input matInput formControlName="priezvisko">
+            </mat-form-field>
+
+            <button mat-raised-button color="warn" type="button" (click)="removeDirector(i)">
+              <mat-icon>remove_circle</mat-icon> Remove
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="margin-top">
+        <button mat-raised-button color="primary" type="button" (click)="addDirector()">
+          <mat-icon>add</mat-icon> Add Director
+        </button>
+      </div>
+
+      <p class="section-title">Characters:</p>
+      <div formArrayName="postava">
+        @for(character of postava.controls; track character; let i = $index) {
+          <div [formGroupName]="i"
+               [style.background]="i % 2 === 0 ? '#e8f0fe' : '#ffffff'"
+               class="form-entry-box">
+
+            <mat-form-field appearance="fill">
+              <mat-label>Character name</mat-label>
+              <input matInput formControlName="name">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Character type</mat-label>
+              <mat-select formControlName="typPostavy">
+                <mat-option value="hlavná postava">Main Character</mat-option>
+                <mat-option value="vedľajšia postava">Supporting Character</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Actor - First name</mat-label>
+              <input matInput formControlName="actorKrstneMeno">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Actor - Middle name</mat-label>
+              <input matInput formControlName="actorStredneMeno">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Actor - Surname</mat-label>
+              <input matInput formControlName="actorPriezvisko">
+            </mat-form-field>
+
+            <button mat-raised-button color="warn" type="button" (click)="removeCharacter(i)">
+              <mat-icon>remove_circle</mat-icon> Remove
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="margin-top">
+        <button mat-raised-button color="primary" type="button" (click)="addCharacter()">
+          <mat-icon>add</mat-icon> Add Character
+        </button>
+      </div>
+
+      <p class="section-title">Ranking positions:</p>
+      <div formGroupName="poradieVRebricku" class="form-entry-box">
+        <div class="flex-wrap-gap">
+          @for(name of poradieKeys; track name) {
+            <mat-form-field appearance="fill">
+              <mat-label>{{ name }}</mat-label>
+              <input matInput type="number" [formControlName]="name">
+            </mat-form-field>
+          }
+        </div>
+      </div>
+
+      <mat-card-actions>
+        <button type="submit" mat-raised-button color="accent" [disabled]="filmModel.invalid">Save Film</button>
+      </mat-card-actions>
+
+    </mat-card-content>
+
+
+  </mat-card>
+</form>

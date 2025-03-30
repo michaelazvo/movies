@@ -1,9 +1,10 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { catchError, Observable } from 'rxjs';
+import { catchError, EMPTY, map, Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 import { Film } from '../entities/film';
 import { UsersService } from './users.service';
+import { MessageService } from './message.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ export class FilmsService {
   url = environment.restServerUrl;
   http = inject(HttpClient);
   usersService = inject(UsersService)
+  msgService = inject(MessageService);
 
   get token() {
     return this.usersService.token;
@@ -39,10 +41,57 @@ export class FilmsService {
 
     }
     return this.http.get<FilmsResponse>(this.url + 'films', options).pipe(
-        catchError(error => this.usersService.processError(error))
+        catchError(error => this.processError(error))
     )
   }
+
+    getFilm(id: number): Observable<Film> {
+      return this.http.get<Film>(`${this.url}films/${id}`, this.getTokenHeader()).pipe(
+        map(json => Film.clone(json)),
+        catchError(err => this.processError(err))
+      );
+    }
+
+    saveFilm(film: Film): Observable<Film> {
+      return this.http.post<Film>(`${this.url}films`, film, this.getTokenHeader()).pipe(
+        map(json => Film.clone(json)),
+        catchError(err => this.processError(err))
+      );
+    }
+
+    deleteFilm(id: number): Observable<void> {
+      return this.http.delete<void>(
+        `${this.url}films/${id}`,
+        this.getTokenHeader() 
+      ).pipe(
+        catchError(err => this.processError(err))
+      );
+    }
+    
+    
+    processError(error:any){
+        if(error instanceof HttpErrorResponse){
+          if (error.status === 0){
+            this.msgService.error('Server not available');
+            return EMPTY;
+          }
+          if(error.status >= 400 && error.status < 500){
+            const message = error.error?.errorMessage ? error.error.errorMessage : JSON.parse(error.error).errorMessage;
+            this.msgService.error(message);
+            return EMPTY;
+          }
+          console.error(error);
+          this.msgService.error("Server error, please contact administrator");
+        } else {
+          console.error(error);
+          this.msgService.error("Your angular developer did something wrong");
+        }
+        return EMPTY;
+          
+    }
 }
+
+
 
 export interface FilmsResponse{
   items: Film[],
